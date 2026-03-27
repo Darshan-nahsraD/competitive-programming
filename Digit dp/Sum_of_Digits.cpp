@@ -13,25 +13,27 @@ using ll=long long ;
 vector<int> digit;
 int len;
 int t=1;
-int dp[10][2][2];
-int dfs(int pos , int tight, int zeros){
+pair<int,int> dp[11][2];
+pair<int,int> dfs(int pos , int tight){
     if(pos==len){
-        return 0;
+        return {1,0};
     }
-    if(dp[pos][tight][zeros]!=-1) return dp[pos][tight][zeros];
+    if(dp[pos][tight].first!=-1) return dp[pos][tight];
     int ans=0;
     int upper_limit=(tight)? digit[pos] : 9;
+    int cnt=0;
     for(int i=0;i<=upper_limit;i++){
         int nw_tight= (tight && i==upper_limit);
-        int nw_zeros= (i==0 && zeros);
-        ans+=i*pow(10*1LL,(len-pos-1));
-        dfs(pos+1, nw_tight, nw_zeros);
+        auto it =dfs(pos+1, nw_tight);
+
+        cnt+=it.first;
+        ans+=it.second + i* it.first;
     }
-    return dp[pos][tight][zeros]=ans;
+    return dp[pos][tight]={cnt, ans};
 }
 void solve(){
     string a, b;cin>>a>>b;
-    if(a=="-1" && b=="-1") {t=0; return;}
+    if(a=="-1" || b=="-1") {t=0; return;}
     len=b.size();
     digit.resize(len);
     for(int i=0;i<len;i++){
@@ -39,8 +41,12 @@ void solve(){
     }
     
     // for(auto ele: digit) cout<<ele<<" ";cout<<endl;
-    memset(dp,-1, sizeof(dp));
-    int x=dfs(0, 1, 1);
+    for(int i = 0; i < 11; i++) {
+        for(int j = 0; j < 2; j++) {
+            dp[i][j] = {-1, -1};
+        }
+    }
+    auto x=dfs(0, 1);
     
     len=a.size();
     digit.resize(len);
@@ -49,11 +55,15 @@ void solve(){
     }
     
     // for(auto ele: digit) cout<<ele<<" ";cout<<endl;
-    memset(dp,-1, sizeof(dp));
-    int y=dfs(0, 1, 1);
+    for(int i = 0; i < 11; i++) {
+        for(int j = 0; j < 2; j++) {
+            dp[i][j] = {-1, -1};
+        }
+    }
+    auto y=dfs(0, 1);
     int digit_count=0;
     for(auto ele: a) digit_count+=ele-'0';
-    cout<<x-y+digit_count<<endl;
+    cout<<x.second-y.second+digit_count<<endl;
 
 }
 
